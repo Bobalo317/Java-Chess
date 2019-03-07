@@ -22,7 +22,7 @@ public class GUIboard {
 	private final JPanel chessGUI = new JPanel(new BorderLayout(3,3));
 	private JPanel chessBoard;
 	private sButton[][] chessSquares = new sButton[8][8];
-	private Image[][] chessPieces = new Image[2][6];
+	private static Image[][] chessPieces = new Image[2][6];
 	
 	public static final int BLACK = 0, WHITE = 1, EMPTY = -1, ROOK = 0, BISHOP = 1, QUEEN = 2, KING = 3, KNIGHT = 4, PAWN = 5; //outlining the positioning of the color/pieces of the png
 	public static final int[] PIECE_ORDER = {ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK}; 
@@ -32,7 +32,13 @@ public class GUIboard {
 	
 	ImageIcon icon =  new ImageIcon(new BufferedImage(69, 69, BufferedImage.TYPE_INT_ARGB));
 	
-
+	public sButton getSquare(int c, int r) {
+		return chessSquares[c][r]; 
+	}
+	
+	public static Image getPieceImage(int color, int piece) {
+		return chessPieces[color][piece];
+	}
 	
 	
 
@@ -72,7 +78,7 @@ public class GUIboard {
 		tbuttons.add(exitButton);
 		
 		chessBoard = new JPanel(new GridLayout(0,10));
-		chessBoard.setBorder(new CompoundBorder(new EmptyBorder(10,10,10,10), new LineBorder(Color.black)));
+		chessBoard.setBorder(new LineBorder(Color.black));
 		
 		JPanel boardLayout = new JPanel(new GridBagLayout());
 		boardLayout.add(chessBoard);
@@ -84,6 +90,7 @@ public class GUIboard {
 			for (int j = 0; j < chessSquares[i].length; j++) {
 				sButton square = new sButton();
 				square.setMargin(squareMargin);
+				square.setBorderPainted(false);
 				square.setIcon(icon);
 				
 				if((j % 2 == 1 && i % 2 == 1) || (j % 2 == 0 && i % 2 == 0)) {
@@ -132,8 +139,6 @@ public class GUIboard {
 	}
 	
 	public final void convertImage() { // method when called imports the png of the pieces into the chessPiece element
-		//String picPieces = "319_All_Chess_Pieces_Png_by_abener.png";
-		//BufferedImage holder = null;
 		try {
 			BufferedImage holder = ImageIO.read(new File("E:\\Coding Project\\Java Chess\\src\\JPanelBoard\\clear.png"));
 			for(int i = 0; i < 2; i++) {
@@ -163,25 +168,28 @@ public class GUIboard {
 				CS.pieceMoveCounter = 0;
 				
 				holdSquare.mCounter++;
-				
-				if(holdSquare.pType == KNIGHT) {
-					System.out.println("true1");
-				}
-				
 			}
 		}
 		else if(CS.pColor == EMPTY && holdSquare.pColor != EMPTY){ //moving piece to an empty square
-			if(castling(CS, holdSquare) != true) {
+			if(CS.row == holdSquare.row && CS.column == holdSquare.column) { //checks if player is putting piece back down
+				CS.pColor = holdSquare.pColor;
+				CS.pType = holdSquare.pType;
+				CS.setIcon(holdSquare.getIcon());
+				holdSquare.mCounter--;
+			}
+			else if(castling(CS, holdSquare) != true) {
 				CS.pColor = holdSquare.pColor;
 				CS.pType = holdSquare.pType;
 				CS.setIcon(holdSquare.getIcon());
 				CS.pieceMoveCounter++;
-				/*if(holdSquare.pType == KNIGHT)	//TEST FOR NIGHT RULE
-					{
-					if(PieceRules.nRule(CS, holdSquare) == true) {
+				/*if(holdSquare.pType == PAWN) {//TEST FOR NIGHT RULE
+					System.out.println("t1");
+					if(PieceRules.pRule(CS, holdSquare) == true) {
+						System.out.println("t2");
 					}
 					else
-						return;*/
+						return;
+				}*/
 			}
 			holdSquare.pColor = EMPTY;
 			holdSquare.pType = EMPTY;
@@ -192,6 +200,14 @@ public class GUIboard {
 		}
 		else if(CS.pColor != EMPTY && holdSquare.pColor != EMPTY) { //capturing a piece
 			if(CS.pColor != holdSquare.pColor) {
+				if(holdSquare.pType == PAWN) {//TEST FOR NIGHT RULE
+					System.out.println("t1");
+					if(PieceRules.pRule(CS, holdSquare) == true) {
+						System.out.println("t2");
+					}
+					else
+						return;
+				}
 				CS.pColor = holdSquare.pColor;
 				CS.pType = holdSquare.pType;
 				CS.setIcon(holdSquare.getIcon());
@@ -317,6 +333,12 @@ public class GUIboard {
 				chessSquares[i][j].pieceMoveCounter = 0;
 			}
 		}
+		holdSquare.pColor = EMPTY;
+		holdSquare.pType = EMPTY;
+		holdSquare.row = EMPTY;
+		holdSquare.column = EMPTY;
+		holdSquare.setIcon(icon);
+		holdSquare.pieceMoveCounter = 0;
 		holdSquare.mCounter = 1;
 	}
 	
