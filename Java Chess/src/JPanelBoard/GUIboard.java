@@ -49,7 +49,6 @@ public class GUIboard {
 	
 	
 	
-	@SuppressWarnings("serial")
 	public final void startGame() {
 		
 		convertImage();
@@ -105,7 +104,7 @@ public class GUIboard {
 				square.pColor = EMPTY;
 				square.pType = EMPTY;
 				
-				square.addActionListener(e -> moving(square, holdSquare));
+				square.addActionListener(e -> moving(square, holdSquare, chessSquares));
 				
 				chessSquares[j][i] = square;
 			}
@@ -152,7 +151,7 @@ public class GUIboard {
 		
 	}
 	
-	public final void moving(sButton CS, sButton holdSquare) { //method for the board squares to move the pieces 
+	public final void moving(sButton CS, sButton holdSquare, sButton[][] board) { //method for the board squares to move the pieces 
 		if(CS.pColor != EMPTY && holdSquare.pColor == EMPTY) { //picking up a piece and making sure the correct color can only move on the correct turn
 			if((holdSquare.mCounter % 2 == 1 && CS.pColor == WHITE) || (holdSquare.mCounter % 2 == 0 && CS.pColor == BLACK)) {
 				holdSquare.pColor = CS.pColor;
@@ -170,7 +169,7 @@ public class GUIboard {
 				holdSquare.mCounter++;
 			}
 		}
-		else if(CS.pColor == EMPTY && holdSquare.pColor != EMPTY){ //moving piece to an empty square
+		else if(holdSquare.pColor != EMPTY){ //moving piece to an empty square
 			if(CS.row == holdSquare.row && CS.column == holdSquare.column) { //checks if player is putting piece back down
 				CS.pColor = holdSquare.pColor;
 				CS.pType = holdSquare.pType;
@@ -178,7 +177,7 @@ public class GUIboard {
 				holdSquare.mCounter--;
 			}
 			else if(castling(CS, holdSquare) != true) {
-				CS.pColor = holdSquare.pColor;
+				/*CS.pColor = holdSquare.pColor;
 				CS.pType = holdSquare.pType;
 				CS.setIcon(holdSquare.getIcon());
 				CS.pieceMoveCounter++;
@@ -190,6 +189,10 @@ public class GUIboard {
 					else
 						return;
 				}*/
+				
+				if(PieceRules.pieceMoves(CS, holdSquare, board) != true) {
+					return;
+				}
 			}
 			holdSquare.pColor = EMPTY;
 			holdSquare.pType = EMPTY;
@@ -198,17 +201,12 @@ public class GUIboard {
 			holdSquare.setIcon(icon);
 			holdSquare.pieceMoveCounter = 0;
 		}
-		else if(CS.pColor != EMPTY && holdSquare.pColor != EMPTY) { //capturing a piece
+		/*else if(CS.pColor != EMPTY && holdSquare.pColor != EMPTY) { //capturing a piece
 			if(CS.pColor != holdSquare.pColor) {
-				if(holdSquare.pType == PAWN) {//TEST FOR NIGHT RULE
-					System.out.println("t1");
-					if(PieceRules.pRule(CS, holdSquare) == true) {
-						System.out.println("t2");
-					}
-					else
-						return;
+				if(PieceRules.pieceMoves(CS, holdSquare, board) != true) {
+					return;
 				}
-				CS.pColor = holdSquare.pColor;
+				/*CS.pColor = holdSquare.pColor;
 				CS.pType = holdSquare.pType;
 				CS.setIcon(holdSquare.getIcon());
 				CS.pieceMoveCounter = holdSquare.pieceMoveCounter;
@@ -220,7 +218,7 @@ public class GUIboard {
 				holdSquare.setIcon(icon);
 				holdSquare.pieceMoveCounter = 0;
 			}
-		}
+		}*/
 		//else if(CS.pColor == EMPTY && holdSquare.pColor == EMPTY)//do nothing	
 	}
 	
